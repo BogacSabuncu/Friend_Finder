@@ -4,20 +4,23 @@
     <meta charset="UTF-8" />
     <title>Friend Finder</title>
 
-    <!-- Latest compiled and minified CSS -->
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-    />
+	<!-- Latest compiled and minified CSS -->
+	
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery.js"></script>
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-    />
-    <script src="https://code.jquery.com/jquery.js"></script>
+	/>
+	<script
+	src="https://code.jquery.com/jquery-3.4.1.min.js"
+	integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+	crossorigin="anonymous"></script>
   </head>
 
   <body>
     <div class="container">
+
         <h1 class="text-center font-weight-bold"> Survey Questions </h1>
         <hr />
 
@@ -146,22 +149,45 @@
         </div>
     </form>
     </div>
-      </div>
+	  </div>
 
       <footer class="footer">
         <div class="container">
                 <p><a href="/api/allFriends">API Friend List</a> | <a href="https://github.com/BogacSabuncu/Friend_Finder">GitHub Repo</a>
         </div>
       </footer>
-    </div>
+	</div>
+
+	<!-- Modal -->
+<div class="modal fade" id="matchModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title" id="modalTitle">Your Next Best Friend</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="modal-body">
+				<h2 id="matchName">Match Name</h2>
+				<img id="match-img" src="..." alt="Person Image">
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  
   </body>
 </html>
 
 <script type="text/javascript">
 
+	//when submit button is pressed
 	$(".submit").on("click", function(event){
-        event.preventDefault();
-
+        event.preventDefault();//stop deleting everything from the form
+		//if required fields are not completed display message
         if ($("#name").val()==="" || $("#photoLink").val().trim()===""){
 			if($("#name").val()===""){
 				$("#name").addClass("is-invalid");
@@ -171,34 +197,39 @@
 			}
 		}
 		else{
+			//create a new object of friend
         	let newFriend = {
                 name : $("#name").val().trim(),
                 photo : $("#photoLink").val().trim(),
                 scores: []
         	}
-        
+			//populate the scores
         	$(".surveyQuestion").each(function(){
 				newFriend.scores.push($(this).val());
 				$(this).val("0");
         	}); 
-
+			//reset the values on the form
 			$("#name").val("");
 			$("#photoLink").val("");
 
+			//make a post request to get the friend that best matches
 			$.post("/api/bestfriend", newFriend)
 			.then(function(data){
 				console.log(data);
-				
 
+				//modal display
+				$("#matchName").text(data.name);
+				$("#match-img").attr("src", data.photo);
 
+				$("#matchModal").modal("toggel");
 
+				//add the new friend to data after getting the best friend information
 				$.post("/api/allFriends", newFriend)
 				.then(function(data){
 					console.log(data);
 				});
 			});
 
-			//console.log(newFriend);
 		}
 	});
 </script>

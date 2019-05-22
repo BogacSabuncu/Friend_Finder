@@ -174,21 +174,31 @@
         	let newFriend = {
                 name : $("#name").val().trim(),
                 photo : $("#photoLink").val().trim(),
-                answersArr: []
+                scores: []
         	}
         
         	$(".surveyQuestion").each(function(){
-				newFriend.answersArr.push($(this).val());
+				newFriend.scores.push($(this).val());
 				$(this).val("0");
         	}); 
 
 			$("#name").val("");
 			$("#photoLink").val("");
 
-			$.post("/api/allFriends", newFriend)
+			$.post("/api/bestfriend", newFriend)
 			.then(function(data){
 				console.log(data);
+				
+
+
+
+				$.post("/api/allFriends", newFriend)
+				.then(function(data){
+					console.log(data);
+				});
 			});
+
+			//console.log(newFriend);
 		}
 	});
 </script>
